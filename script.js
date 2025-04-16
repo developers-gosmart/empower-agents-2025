@@ -191,7 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
         agentesTableBody.innerHTML = '';
         agentes.forEach(agente => {
             const row = agentesTableBody.insertRow();
-            row.insertCell().innerHTML = `<img src="${agente.image || 'https://via.placeholder.com/50'}" alt="${agente.fullName}" style="max-width: 50px; height: auto; vertical-align: middle;">`;
+            if (agente.image) {
+                imageCell.innerHTML = `<img src="${agente.image}" style="max-width: 50px; height: auto; vertical-align: middle;">`;
+            } else {
+                imageCell.innerHTML = `<img src="profile.webp" style="max-width: 50px; height: auto; vertical-align: middle;">`; // Mostrar profile.webp
+            }
             row.insertCell().textContent = agente.fullName;
             row.insertCell().textContent = agente.agentNumber; // Nuevo
             row.insertCell().textContent = agente.anlzdPrem;     // Nuevo
