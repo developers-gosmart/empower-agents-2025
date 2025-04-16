@@ -191,11 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         agentesTableBody.innerHTML = '';
         agentes.forEach(agente => {
             const row = agentesTableBody.insertRow();
-            if (agente.image) {
-                imageCell.innerHTML = `<img src="${agente.image}" style="max-width: 50px; height: auto; vertical-align: middle;">`;
-            } else {
-                imageCell.innerHTML = `<img src="profile.webp" style="max-width: 50px; height: auto; vertical-align: middle;">`; // Mostrar profile.webp
-            }
+            row.insertCell().innerHTML = `<img src="${agente.image || 'profile.webp'}" alt="${agente.fullName}" style="max-width: 50px; height: auto; vertical-align: middle;">`;
             row.insertCell().textContent = agente.fullName;
             row.insertCell().textContent = agente.agentNumber; // Nuevo
             row.insertCell().textContent = agente.anlzdPrem;     // Nuevo
