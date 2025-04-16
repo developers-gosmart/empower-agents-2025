@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullNameInput = document.getElementById('fullName');
     const stateInput = document.getElementById('state');
     const salesInput = document.getElementById('sales');
+    const agentNumberInput = document.getElementById('agent_number');
+    const anlzdPremInput = document.getElementById('anlzd_prem');
     const modalEliminar = document.getElementById('modalEliminar');
     const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
     const closeModalButtons = document.querySelectorAll('.close-button');
@@ -16,14 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnExportarExcel = document.getElementById('btnExportarExcel');
     const btnExportarPDF = document.getElementById('btnExportarPDF');
 
-    const apiUrl = 'http://wstableagentempower.gosmartcrm.com:5400/ws';
+    const apiUrl = 'https://wstableagentempower.gosmartcrm.com:8443/ws';
     const headers = {
         'Content-Type': 'application/json',
     };
 
     let agentes = [];
     let agenteAEditarId = null;
-    let agenteAEliminarId = null;
     let totalRecords = 0;
     let currentPage = 1;
     let currentLength = 10;
@@ -192,6 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = agentesTableBody.insertRow();
             row.insertCell().innerHTML = `<img src="${agente.image || 'https://via.placeholder.com/50'}" alt="${agente.fullName}" style="max-width: 50px; height: auto; vertical-align: middle;">`;
             row.insertCell().textContent = agente.fullName;
+            row.insertCell().textContent = agente.agentNumber; // Nuevo
+            row.insertCell().textContent = agente.anlzdPrem;     // Nuevo
             row.insertCell().textContent = agente.state;
             row.insertCell().textContent = agente.sales;
             const actionsCell = row.insertCell();
@@ -239,8 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const fullName = fullNameInput.value;
         const state = stateInput.value;
         const sales = parseInt(salesInput.value);
+        const agentNumber = agentNumberInput.value; // Nuevo
+        const anlzdPrem = parseFloat(anlzdPremInput.value);     // Nuevo
 
-        const nuevoAgente = { id: agenteAEditarId, image, fullName, state, sales };
+        const nuevoAgente = { id: agenteAEditarId, image, fullName, state, sales, agentNumber, anlzdPrem }; // Nuevo
 
         if (agenteAEditarId) {
             actualizarAgente(nuevoAgente);
@@ -254,10 +259,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const agenteAEditar = agentes.find(agente => agente.id === id);
         if (agenteAEditar) {
             agenteIdInput.value = agenteAEditar.id;
-            imageInput.value = agenteAEditar.image || '';
+            imageInput.value = '';
             fullNameInput.value = agenteAEditar.fullName;
             stateInput.value = agenteAEditar.state;
             salesInput.value = agenteAEditar.sales;
+            agentNumberInput.value = agenteAEditar.agentNumber || ''; // Nuevo
+            anlzdPremInput.value = agenteAEditar.anlzdPrem || 0;     // Nuevo
             openModal(modalAgente);
         }
     }
@@ -281,8 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Funciones de exportación (necesitarás librerías externas para formatos avanzados) ---
     btnExportarCSV.addEventListener('click', () => {
         const csvData = [
-            ['id', 'image', 'Nombre Completo', 'state', 'sales'],
-            ...agentes.map(agente => [agente.id, agente.image, agente.fullName, agente.state, agente.sales])
+            ['id', 'image', 'Nombre Completo', 'agent_number', 'anlzd_prem', 'state', 'sales'], // Nuevo
+            ...agentes.map(agente => [agente.id, agente.image, agente.fullName, agente.agentNumber, agente.anlzdPrem, agente.state, agente.sales]) // Nuevo
         ].map(row => row.join(',')).join('\n');
         const blob = new Blob([csvData], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);

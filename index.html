@@ -23,11 +23,13 @@
         <table id="agentesTable">
             <thead>
                 <tr>
-                    <th>image</th>
-                    <th>Nombre Completo</th>
-                    <th>status</th>
-                    <th>sales</th>
-                    <th>Acciones</th>
+                    <th>IMAGE</th>
+                    <th>NOMBRE COMPLETO</th>
+                    <th>AGENT NUMBER</th>
+                    <th>ANLZD PREM</th>
+                    <th>STATUS</th>
+                    <th>SALES</th>
+                    <th>ACCIONES</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,8 +49,16 @@
                         <input type="hidden" id="image" name="image">
                     </div>
                     <div>
-                        <label for="Fullname">Nombre Completo:</label>
+                        <label for="fullName">Nombre Completo:</label>
                         <input type="text" id="fullName" name="fullName" required>
+                    </div>
+                    <div>
+                        <label for="agent_number">Agent Number:</label>
+                        <input type="text" id="agent_number" name="agent_number">
+                    </div>
+                    <div>
+                        <label for="anlzd_prem">Anlzd Prem:</label>
+                        <input type="number" id="anlzd_prem" name="anlzd_prem" value="0">
                     </div>
                     <div>
                         <label for="state">Status:</label>
