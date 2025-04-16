@@ -1,0 +1,62 @@
+<link rel="stylesheet" href="style.css">
+<table id="agentesTable">
+    <thead>
+        <tr>
+            <th>image</th>
+            <th>Nombre Completo</th>
+            <th>status</th>
+            <th>sales</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const agentesTableBody = document.querySelector('#agentesTable tbody');
+        const apiUrl = 'http://wstableagentempower.gosmartcrm.com:5400/ws';
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+
+        let agentes = [];
+
+        async function obtenerAgentes() {
+            console.log('Obteniendo agentes...');
+            try {
+                const response = await fetch(`${apiUrl}/agent/list`, {
+                    method: 'GET',
+                    headers: headers,
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! state: ${response.state}`);
+                }
+                const resp = await response.json();
+                const data = resp.data;
+                agentes = data;
+                renderTable();
+            } catch (error) {
+                console.error('Error al obtener agentes:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al cargar',
+                    text: 'No se pudieron cargar los agentes.',
+                });
+            }
+        }
+
+        function renderTable() {
+            agentesTableBody.innerHTML = '';
+            agentes.forEach(agente => {
+                const row = agentesTableBody.insertRow();
+                row.insertCell().innerHTML = `<img src="${agente.image || 'https://via.placeholder.com/50'}" alt="${agente.fullName}" style="max-width: 50px; height: auto; vertical-align: middle;">`;
+                row.insertCell().textContent = agente.fullName;
+                row.insertCell().textContent = agente.state;
+                row.insertCell().textContent = agente.sales;
+            });
+        }
+
+        // --- Inicialización ---
+        obtenerAgentes();
+    });
+</script>

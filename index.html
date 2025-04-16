@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Agentes</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Gestión de Agentes</h1>
+        <button id="btnNuevoAgente">Nuevo Agente</button>
+
+        <div class="table-controls">
+            <button id="btnExportarCSV">Exportar CSV</button>
+            <button id="btnExportarExcel">Exportar Excel</button>
+            <button id="btnExportarPDF">Exportar PDF</button>
+        </div>
+
+        <table id="agentesTable">
+            <thead>
+                <tr>
+                    <th>image</th>
+                    <th>Nombre Completo</th>
+                    <th>status</th>
+                    <th>sales</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <div id="modalAgente" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Registrar/Modificar Agente</h2>
+                <form id="formAgente">
+                    <input type="hidden" id="agenteId">
+                    <div>
+                        <label for="image">image (URL):</label>
+                        <input type="file" id="imageFile" name="imageFile" accept="image/*">
+                        <input type="hidden" id="image" name="image">
+                    </div>
+                    <div>
+                        <label for="Fullname">Nombre Completo:</label>
+                        <input type="text" id="fullName" name="fullName" required>
+                    </div>
+                    <div>
+                        <label for="state">Status:</label>
+                        <select name="state" id="state">
+                            <option value="">Selecciona un estado</option>
+                            <option value="AL">Alabama</option>
+                            <option value="AK">Alaska</option>
+                            <option value="AZ">Arizona</option>
+                            <option value="AR">Arkansas</option>
+                            <option value="CA">California</option>
+                            <option value="CO">Colorado</option>
+                            <option value="CT">Connecticut</option>
+                            <option value="DE">Delaware</option>
+                            <option value="FL">Florida</option>
+                            <option value="GA">Georgia</option>
+                            <option value="HI">Hawái</option>
+                            <option value="ID">Idaho</option>
+                            <option value="IL">Illinois</option>
+                            <option value="IN">Indiana</option>
+                            <option value="IA">Iowa</option>
+                            <option value="KS">Kansas</option>
+                            <option value="KY">Kentucky</option>
+                            <option value="LA">Luisiana</option>
+                            <option value="ME">Maine</option>
+                            <option value="MD">Maryland</option>
+                            <option value="MA">Massachusetts</option>
+                            <option value="MI">Míchigan</option>
+                            <option value="MN">Minnesota</option>
+                            <option value="MS">Misisipi</option>
+                            <option value="MO">Misuri</option>
+                            <option value="MT">Montana</option>
+                            <option value="NE">Nebraska</option>
+                            <option value="NV">Nevada</option>
+                            <option value="NH">Nuevo Hampshire</option>
+                            <option value="NJ">Nueva Jersey</option>
+                            <option value="NM">Nuevo México</option>
+                            <option value="NY">Nueva York</option>
+                            <option value="NC">Carolina del Norte</option>
+                            <option value="ND">Dakota del Norte</option>
+                            <option value="OH">Ohio</option>
+                            <option value="OK">Oklahoma</option>
+                            <option value="OR">Oregón</option>
+                            <option value="PA">Pensilvania</option>
+                            <option value="RI">Rhode Island</option>
+                            <option value="SC">Carolina del Sur</option>
+                            <option value="SD">Dakota del Sur</option>
+                            <option value="TN">Tennessee</option>
+                            <option value="TX">Texas</option>
+                            <option value="UT">Utah</option>
+                            <option value="VT">Vermont</option>
+                            <option value="VA">Virginia</option>
+                            <option value="WA">Washington</option>
+                            <option value="WV">Virginia Occidental</option>
+                            <option value="WI">Wisconsin</option>
+                            <option value="WY">Wyoming</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="sales">Sales:</label>
+                        <input type="number" id="sales" name="sales" value="0">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit">Guardar</button>
+                        <button type="button" class="close-button">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="modalEliminar" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Confirmar Eliminación</h2>
+                <p>¿Estás seguro de que deseas eliminar este agente?</p>
+                <div class="modal-actions">
+                    <button id="btnConfirmarEliminar">Eliminar</button>
+                    <button type="button" class="close-button">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
