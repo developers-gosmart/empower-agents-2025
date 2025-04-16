@@ -2,10 +2,10 @@
 <table id="agentesTable">
     <thead>
         <tr>
-            <th>image</th>
-            <th>Nombre Completo</th>
-            <th>status</th>
-            <th>sales</th>
+            <th>IMAGEN</th>
+            <th>NOMBRE</th>
+            <th>ANLZD PREM</th>
+            <th>POLIZAS</th>
         </tr>
     </thead>
     <tbody>
@@ -14,7 +14,7 @@
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', () => {
         const agentesTableBody = document.querySelector('#agentesTable tbody');
-        const apiUrl = 'http://wstableagentempower.gosmartcrm.com:5400/ws';
+        const apiUrl = 'https://wstableagentempower.gosmartcrm.com:8443/ws';
         const headers = {
             'Content-Type': 'application/json',
         };
@@ -49,9 +49,9 @@
             agentesTableBody.innerHTML = '';
             agentes.forEach(agente => {
                 const row = agentesTableBody.insertRow();
-                row.insertCell().innerHTML = `<img src="${agente.image || 'https://via.placeholder.com/50'}" alt="${agente.fullName}" style="max-width: 50px; height: auto; vertical-align: middle;">`;
+                row.insertCell().innerHTML = `<img src="${agente.image || 'profile.webp'}" alt="${agente.fullName}" style="max-width: 50px; height: auto; vertical-align: middle;">`;
                 row.insertCell().textContent = agente.fullName;
-                row.insertCell().textContent = agente.state;
+                row.insertCell().textContent = agente.anlzdPrem;
                 row.insertCell().textContent = agente.sales;
             });
         }

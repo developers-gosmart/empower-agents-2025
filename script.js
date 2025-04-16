@@ -17,6 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnExportarCSV = document.getElementById('btnExportarCSV');
     const btnExportarExcel = document.getElementById('btnExportarExcel');
     const btnExportarPDF = document.getElementById('btnExportarPDF');
+    const imagePreview = document.getElementById('imagePreview'); // Nuevo elemento para la vista previa
+    const cropOptions = {
+        aspectRatio: 1 / 1, // Relación de aspecto cuadrada
+        viewMode: 1,
+    };
+    let cropper;
 
     const apiUrl = 'https://wstableagentempower.gosmartcrm.com:8443/ws';
     const headers = {
@@ -193,8 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = agentesTableBody.insertRow();
             row.insertCell().innerHTML = `<img src="${agente.image || 'profile.webp'}" alt="${agente.fullName}" style="max-width: 50px; height: auto; vertical-align: middle;">`;
             row.insertCell().textContent = agente.fullName;
-            row.insertCell().textContent = agente.agentNumber; // Nuevo
-            row.insertCell().textContent = agente.anlzdPrem;     // Nuevo
+            row.insertCell().textContent = agente.agentNumber;
+            row.insertCell().textContent = agente.anlzdPrem;
             row.insertCell().textContent = agente.state;
             row.insertCell().textContent = agente.sales;
             const actionsCell = row.insertCell();
@@ -222,6 +228,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeModal(modal) {
         modal.style.display = 'none';
         formAgente.reset();
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        imagePreview.src = ''; // Limpiar la vista previa
+        imageInput.value = ''; // Limpiar el campo oculto
         agenteAEditarId = null;
     }
 
@@ -236,16 +248,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    formAgente.addEventListener('submit', (event) => {
+    formAgente.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const image = imageInput.value;
+        if (!cropper) {
+            Swal.fire('Error', 'Por favor, selecciona y recorta una imagen.', 'error');
+            return;
+        }
+        const croppedCanvas = cropper.getCroppedCanvas();
+        const croppedImageBase64 = croppedCanvas.toDataURL('image/png'); // Puedes elegir otro formato
+
         const fullName = fullNameInput.value;
         const state = stateInput.value;
         const sales = parseInt(salesInput.value);
-        const agentNumber = agentNumberInput.value; // Nuevo
-        const anlzdPrem = parseFloat(anlzdPremInput.value);     // Nuevo
+        const agentNumber = agentNumberInput.value;
+        const anlzdPrem = parseFloat(anlzdPremInput.value);
 
-        const nuevoAgente = { id: agenteAEditarId, image, fullName, state, sales, agentNumber, anlzdPrem }; // Nuevo
+        const nuevoAgente = { id: agenteAEditarId, image: croppedImageBase64, fullName, state, sales, agentNumber, anlzdPrem };
 
         if (agenteAEditarId) {
             actualizarAgente(nuevoAgente);
@@ -259,37 +277,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const agenteAEditar = agentes.find(agente => agente.id === id);
         if (agenteAEditar) {
             agenteIdInput.value = agenteAEditar.id;
-            imageInput.value = '';
+            imagePreview.src = agenteAEditar.image || 'profile.webp'; // Mostrar imagen existente
+            imageInput.value = agenteAEditar.image || '';
             fullNameInput.value = agenteAEditar.fullName;
             stateInput.value = agenteAEditar.state;
             salesInput.value = agenteAEditar.sales;
-            agentNumberInput.value = agenteAEditar.agentNumber || ''; // Nuevo
-            anlzdPremInput.value = agenteAEditar.anlzdPrem || 0;     // Nuevo
+            agentNumberInput.value = agenteAEditar.agentNumber || '';
+            anlzdPremInput.value = agenteAEditar.anlzdPrem || 0;
             openModal(modalAgente);
+            // Inicializar Cropper después de que el modal sea visible y la imagen cargue
+            setTimeout(() => {
+                if (imagePreview.src) {
+                    initializeCropper(imagePreview);
+                }
+            }, 300); // Un pequeño delay para asegurar que la imagen se haya cargado
         }
     }
 
     function openDeleteModal(id) {
         agenteAEliminarId = id;
-        // No es necesario abrir la modal aquí, Swal lo reemplaza
-        eliminarAgente(id); // Llamamos directamente a la función de eliminación con confirmación
+        eliminarAgente(id);
     }
 
     btnConfirmarEliminar.addEventListener('click', () => {
-        // Esta parte ya no es necesaria, la lógica de confirmación está en la función eliminarAgente con Swal
+        // La lógica de confirmación está dentro de la función eliminarAgente con Swal
     });
 
     pageSizeSelect.addEventListener('change', (event) => {
         currentLength = parseInt(event.target.value);
-        currentPage = 1; // Reset to the first page when page size changes
+        currentPage = 1;
         obtenerAgentes();
     });
 
-    // --- Funciones de exportación (necesitarás librerías externas para formatos avanzados) ---
+    // --- Funciones de exportación ---
     btnExportarCSV.addEventListener('click', () => {
         const csvData = [
-            ['id', 'image', 'Nombre Completo', 'agent_number', 'anlzd_prem', 'state', 'sales'], // Nuevo
-            ...agentes.map(agente => [agente.id, agente.image, agente.fullName, agente.agentNumber, agente.anlzdPrem, agente.state, agente.sales]) // Nuevo
+            ['id', 'image', 'Nombre Completo', 'agent_number', 'anlzd_prem', 'state', 'sales'],
+            ...agentes.map(agente => [agente.id, agente.image, agente.fullName, agente.agentNumber, agente.anlzdPrem, agente.state, agente.sales])
         ].map(row => row.join(',')).join('\n');
         const blob = new Blob([csvData], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
@@ -304,30 +328,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnExportarExcel.addEventListener('click', () => {
         Swal.fire('Información', 'Función para exportar a Excel (requiere librería como XLSX)', 'info');
-        // Aquí implementarías la lógica con una librería como XLSX.js
     });
 
     btnExportarPDF.addEventListener('click', () => {
         Swal.fire('Información', 'Función para exportar a PDF (requiere librería como jsPDF)', 'info');
-        // Aquí implementarías la lógica con una librería como jsPDF
     });
 
-    function toBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        });
+    function initializeCropper(imgElement) {
+        if (cropper) {
+            cropper.destroy();
+        }
+        cropper = new Cropper(imgElement, cropOptions);
     }
 
-    imageFile.addEventListener('change', async function () {
-        const file = this.files[0];
+    imageFile.addEventListener('change', (event) => {
+        const file = event.target.files[0];
         if (file) {
-            const base64Image = await toBase64(file);
-            imageInput.value = base64Image;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imagePreview.src = e.target.result;
+                // Inicializar Cropper después de cargar la nueva imagen
+                initializeCropper(imagePreview);
+            }
+            reader.readAsDataURL(file);
         } else {
-            imageInput.value = ''; // Limpiar el campo oculto si no se selecciona archivo
+            imagePreview.src = '';
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
         }
     });
 
